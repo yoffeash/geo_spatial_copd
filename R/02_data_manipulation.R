@@ -4,48 +4,57 @@
 baseline <- read_sas("data/raw_data/analysis_file_20121231.sas7bdat", 
          NULL)
 
-
-# convert dates to date
-copd_base <- baseline %>% mutate(date_randomized = as.Date(Rand_Date, origin='1960-01-01'))
-
-copd_pre1 <- copd_base %>% 
-  mutate_at(vars(contains('Days_To_Onset')), .funs = funs(date_exac = as.Date(. + Rand_Date, origin='1960-01-01'))) 
-
-# select only the location and date information
-copd_pre2 <- copd_pre1 %>% select(ID, contains("Severity_EX"), contains("clinic"), latitude, contains("_date_exac"))
-
-# rename date of exacerbation variables
-copd_pre3 <- copd_pre2 %>% 
-  rename_at(vars(contains("Days_To_Onset")), 
-                                     funs(sub("Days_To_Onset","dateofexac",.))) %>%
+copd_pre1 <- baseline %>% 
+  mutate_at(vars(contains('Days_To_Onset')), funs(date_exac = (. + Rand_Date))) %>% # add days to onset to rand date to get sas date for each exacerbation
+  select(ID, contains("Severity_EX"), contains("clinic"), latitude, Rand_Date, contains("_date_exac")) %>% # select only the severity, location and date information
+  rename_at(vars(contains("Days_To_Onset")), # rename date of exacerbation variables
+            funs(sub("Days_To_Onset","dateofexac",.))) %>%
   rename_at(vars(contains("_date_exac")), 
-            funs(sub("_date_exac","",.)))
+            funs(sub("_date_exac","",.))) 
+
+# split into date and severity datasets
+exac_dates_wide <- copd_pre1 %>% select(ID, clinic, nclinic, dateofexac1:dateofexac11)
+exac_severity_wide <- copd_pre1 %>% select(ID, clinic, nclinic, Severity_EX1:Severity_EX11)
+
+# convert wide format date and severity datasets to long
+exac_dates_long <- exac_dates_wide %>% gather(exacnumber, date, dateofexac1:dateofexac11)
+
+# convert wide format date and severity datasets to long and rename exacnumber variable to exac1, exac2, etc....
+exac_dates_long <- exac_dates_wide %>% 
+  gather(exacnumber, date, dateofexac1:dateofexac11)
+exac_dates_long$exacnumber <- str_replace_all(exac_dates_long$exacnumber, "dateofexac", "")
+
+exac_severity_long <- exac_severity_wide %>% 
+  gather(exacnumber, severity, Severity_EX1:Severity_EX11)
+exac_severity_long$exacnumber <- str_replace_all(exac_severity_long$exacnumber, "Severity_EX", "")
+
+# merge severity and date datasets to have long format dataset with date, center and exacnumber
+exac_long <- left_join(exac_dates_long, exac_severity_long)
+
+# convert dates to date and manipulate counts and rates of exacerbation by center
+exac_long <- exac_long %>% 
+  mutate(date = as.Date(date, origin='1960-01-01')) %>% 
+  arrange(clinic) %>% # sort by date
+  add_count(clinic) %>% # add a count by clinic
+  rename(n_in_center = n) %>% # rename n variable
   
-# add month variables
-copd_pre4 <- copd_pre3 %>% 
-  mutate_at(vars(contains("dateofexac")), .funs = funs(month = month(.)))
 
-# count number of exacerbations in each month for each individual
-# create a function
-make_dummies <- function(v, prefix = '') {
-  s <- sort(unique(v))
-  d <- outer(v, s, function(v, s) 1L * (v == s))
-  colnames(d) <- paste0(prefix, s)
-  d
-}
+# add list of all months between start (2006-03-17) and end (2010-04-02)
+date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-04-30"), by="days"))
 
-# bind the dummies to the original dataframe
-copd_pre5 <- cbind(copd_pre4, 
-                   make_dummies(copd_pre4$dateofexac1_month, prefix = 'exac1dummymonth'),
-                                make_dummies(copd_pre4$dateofexac2_month, prefix = 'exac2dummymonth'),
-                                             make_dummies(copd_pre4$dateofexac3_month, prefix = 'exac3dummymonth'),
-                                                          make_dummies(copd_pre4$dateofexac4_month, prefix = 'exac4dummymonth'),
-                                                                       make_dummies(copd_pre4$dateofexac5_month, prefix = 'exac5dummymonth'),
-                                                                                    make_dummies(copd_pre4$dateofexac6_month, prefix = 'exac6dummymonth'),
-                                                                                                 make_dummies(copd_pre4$dateofexac7_month, prefix = 'exac7dummymonth'),
-                                                                                                              make_dummies(copd_pre4$dateofexac8_month, prefix = 'exac8dummymonth'),
-                                                                                                                           make_dummies(copd_pre4$dateofexac9_month, prefix = 'exac9dummymonth'),
-                                                                                                                                        make_dummies(copd_pre4$dateofexac10_month, prefix = 'exac10dummymonth'),
-                                                                                                                                                     make_dummies(copd_pre4$dateofexac11_month, prefix = 'exac11dummymonth'))
+# merge empty date dataset with exac_long dataset
+exac_long_full <- left_join(date_empty, exac_long)
 
-                                                                                                 
+# add quarter, month and week breaks
+exac_long_full$quarter <- as.Date(cut(exac_long_full$date, breaks = "quarter"))
+exac_long_full$month <- as.Date(cut(exac_long_full$date, breaks = "month"))
+exac_long_full$week <- as.Date(cut(exac_long_full$date, breaks = "week"))
+
+# proportional exacerbation
+exac_long_full <- exac_long_full %>% 
+  mutate(exacyesno = ifelse(is.na(severity),0,1)) %>% # add marker variable for exacerbation
+  mutate(percent_exac = exacyesno/n_in_center*100) %>% 
+  mutate(percent_exac = ifelse(is.na(percent_exac),0,percent_exac)) # add percentage of that center with exacerbations on that day
+
+
+
