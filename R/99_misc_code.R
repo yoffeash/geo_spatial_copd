@@ -27,3 +27,5 @@ copd_pre5 <- cbind(copd_pre4,
                    make_dummies(copd_pre4$dateofexac10_month, prefix = 'exac10dummymonth'),
                    make_dummies(copd_pre4$dateofexac11_month, prefix = 'exac11dummymonth'))
 
+## export for apps
+write_csv(exac_grouped_ninety, "app/data/exacerbations_grouped_ninety.csv")

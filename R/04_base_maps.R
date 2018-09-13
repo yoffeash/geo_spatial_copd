@@ -2,6 +2,9 @@
 
 ## get map of united states
 map1 <- get_map(location='united states',zoom = 4, maptype="terrain", source='google')
+map1 <- get_googlemap(center=c(lon=-96.5795, lat=39.8283), zoom=4, key="AIzaSyDAwVOtaV9r-yRyJtOxOYgaf--q4pv18hg")
+map1
+ggmap(map1)
 
 ## sample maps with size by exacerbation rate with and without plotly
 map2 <- ggmap(map1) + geom_point(aes(x=longitude, y=latitude, size=total_exac_percent, color = mean_severity, fill = mean_severity),
