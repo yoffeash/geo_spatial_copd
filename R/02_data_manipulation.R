@@ -54,16 +54,20 @@ exac_long <- left_join(exac_dates_long, exac_severity_long)
 # convert dates to date and manipulate counts and rates of exacerbation by center
 exac_long <- exac_long %>% 
   mutate(date = as.Date(date, origin='1960-01-01')) %>% 
-  arrange(clinic) %>% # sort by date
-  add_count(clinic) %>% # add a count by clinic
-  rename(n_in_center = n) # rename n variable
-  
+  arrange(date) # sort by date
 
 # add list of all months between start (2006-03-17) and end (2010-04-02)
 date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-04-30"), by="days"))
 
+# load dataset with dates from 3/1/06 to 4/30/10 with enrollment by clinic
+enrollment_by_month <- read_excel("data/raw_data/enrollment_by_clinic.xlsx")
+enrollment_by_month <- enrollment_by_month %>% mutate(date=as.Date(date))
+
 # merge empty date dataset with exac_long dataset
-exac_long_full <- left_join(date_empty, exac_long)
+exac_long_full <- left_join(enrollment_by_month, exac_long)
+
+
+##### Need to update from here and update shiny app ######
 
 # add quarter, month and week breaks
 exac_long_full$quarter <- as.Date(cut(exac_long_full$date, breaks = "quarter"))
