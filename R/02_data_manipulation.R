@@ -66,9 +66,6 @@ enrollment_by_month <- enrollment_by_month %>% mutate(date=as.Date(date))
 # merge empty date dataset with exac_long dataset
 exac_long_full <- left_join(enrollment_by_month, exac_long)
 
-
-##### Need to update from here and update shiny app ######
-
 # add quarter, month and week breaks
 exac_long_full$quarter <- as.Date(cut(exac_long_full$date, breaks = "quarter"))
 exac_long_full$month <- as.Date(cut(exac_long_full$date, breaks = "month"))
@@ -77,9 +74,19 @@ exac_long_full$ninetyday <- as.Date(cut(exac_long_full$date, breaks = "90 days")
 
 # proportional exacerbation
 exac_long_full <- exac_long_full %>% 
+  dplyr::filter(date>"2006-07-01") %>% # remove before July 2006
   mutate(exacyesno = ifelse(is.na(severity),0,1)) %>% # add marker variable for exacerbation
-  mutate(percent_exac = exacyesno/n_in_center*100) %>% 
-  mutate(percent_exac = ifelse(is.na(percent_exac),0,percent_exac)) # add percentage of that center with exacerbations on that day
+  mutate(percent_exac = case_when(clinic=="A" ~ exacyesno/enrollment_clinic_a*100, 
+                                  clinic=="B" ~ exacyesno/enrollment_clinic_b*100,
+                                  clinic=="C" ~ exacyesno/enrollment_clinic_c*100,
+                                  clinic=="D" ~ exacyesno/enrollment_clinic_d*100,
+                                  clinic=="E" ~ exacyesno/enrollment_clinic_e*100,
+                                  clinic=="F" ~ exacyesno/enrollment_clinic_f*100,
+                                  clinic=="G" ~ exacyesno/enrollment_clinic_g*100,
+                                  clinic=="H" ~ exacyesno/enrollment_clinic_h*100,
+                                  clinic=="I" ~ exacyesno/enrollment_clinic_i*100,
+                                  clinic=="J" ~ exacyesno/enrollment_clinic_j*100)) %>% 
+  mutate(percent_exac = ifelse(is.na(percent_exac),0,percent_exac)) # add percentage of that center with exacerbations on that day based on enrollment
 
 # group by quarter and center
 exac_grouped_quarter <- exac_long_full %>% 

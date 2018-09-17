@@ -6,6 +6,7 @@ library(reshape2)
 library(ggmap)
 library(zoo)
 library(plotly)
+library(scales)
 
 # map_key <- "AIzaSyDAwVOtaV9r-yRyJtOxOYgaf--q4pv18hg"
 # map1 <- google_map(key=map_key, location='united states', zoom=4)
@@ -21,7 +22,7 @@ ui <- fluidPage(
    sidebarPanel(   
      fluidRow(
             sliderInput("slider1", h3("Time"),
-                        min = as.Date("2006-03-01"), max = as.Date("2010-02-08"), value = as.Date("2006-03-01"), step=90, animate = animationOptions(interval=3000, loop=TRUE)))),
+                        min = as.Date("2006-05-30"), max = as.Date("2010-02-08"), value = as.Date("2006-05-30"), step=90, animate = animationOptions(interval=3000, loop=TRUE)))),
    
    mainPanel(h3("Map"),
              textOutput("selected_month"),
@@ -36,10 +37,19 @@ server <- function(input, output) {
   })
   
   output$selected_map <- renderPlot({ 
-    mapPoints <- ggmap(map1) + geom_point(aes(x=longitude, y=latitude, size=total_exac_percent, color = mean_severity, fill = mean_severity),
+    mapPoints <- ggmap(map1) + geom_point(aes(x=longitude, y=latitude, size=total_exac_percent, color = mean_severity),
                                          data=subset(exac_grouped_ninety,ninetyday==input$slider1), alpha=0.6, na.rm=TRUE) + 
-                         scale_fill_gradient2(low="orange", mid="red", high="purple", midpoint=2) + 
-                         scale_color_gradient2(low="orange", mid="red", high="purple", midpoint=2) + scale_size(range=c(0,30))
+      scale_color_gradient2(low="orange", mid="red", high="purple", midpoint=2, limits=c(1,4)) + 
+      scale_size_continuous(limits=c(0,100), range=c(0,40)) +
+      labs(colour="Severity of\nExacerbation", size="Exacerbation\nRate") +
+      guides(colour = guide_colorbar(order = 1), 
+             shape = guide_legend(order = 2)) +
+      theme(legend.title = element_text(face="bold", size=20)) +
+      theme(legend.text = element_text(size=14)) +
+      theme(legend.direction = "horizontal") +
+      theme(legend.position = c(0,0), legend.justification = c(0,0)) +
+      theme(legend.background = element_rect(fill=alpha('grey',0.7))) +
+      theme(legend.key = element_blank())
     mapPoints
   })
 }
