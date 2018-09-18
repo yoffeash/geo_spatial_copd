@@ -1,5 +1,7 @@
 ### base and plotly based maps ###
 
+# *** note that this is not adjusted for enrollment issues and should not be used in its current form ***
+
 ## get map of united states
 map1 <- get_map(location='united states',zoom = 4, maptype="terrain", source='google')
 map1 <- get_googlemap(center=c(lon=-96.5795, lat=39.8283), zoom=4, key="AIzaSyDAwVOtaV9r-yRyJtOxOYgaf--q4pv18hg")

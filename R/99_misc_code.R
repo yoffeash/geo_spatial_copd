@@ -29,3 +29,30 @@ copd_pre5 <- cbind(copd_pre4,
 
 ## export for apps
 write_csv(exac_grouped_ninety, "app/data/exacerbations_grouped_ninety.csv")
+
+
+
+# group by quarter and center
+exac_grouped_quarter <- exac_long_full %>% 
+  group_by(clinic, quarter) %>% 
+  summarize(total_exac_percent = sum(percent_exac, na.rm=TRUE), mean_severity = mean(severity, na.rm=TRUE)) %>% 
+  mutate(latitude = case_when(clinic=="A" ~ 39.2904, # add latitude
+                              clinic=="B" ~ 33.5186,
+                              clinic=="C" ~ 42.3601,
+                              clinic=="D" ~ 39.7392,
+                              clinic=="E" ~ 34.0522,
+                              clinic=="F" ~ 44.9778,
+                              clinic=="G" ~ 37.7749,
+                              clinic=="H" ~ 42.2808,
+                              clinic=="I" ~ 39.9526,
+                              clinic=="J" ~ 40.4406)) %>% 
+  mutate(longitude = case_when(clinic=="A" ~ -76.6122, # add longitude
+                               clinic=="B" ~ -86.8104,
+                               clinic=="C" ~ -71.0589,
+                               clinic=="D" ~ -104.9903,
+                               clinic=="E" ~ -118.2437,
+                               clinic=="F" ~ -93.2650,
+                               clinic=="G" ~ -122.4194,
+                               clinic=="H" ~ -83.7430,
+                               clinic=="I" ~ -75.1652,
+                               clinic=="J" ~ -79.9959))
