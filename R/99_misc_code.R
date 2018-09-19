@@ -56,3 +56,28 @@ exac_grouped_quarter <- exac_long_full %>%
                                clinic=="H" ~ -83.7430,
                                clinic=="I" ~ -75.1652,
                                clinic=="J" ~ -79.9959))
+
+## sample code including kruskall wallis and boxplot for differences in ... (exacerbation rate, time to er, etc) by ... (season, center, region, etc)
+kw_clinic <- baseline %>% select(rate_exacerb, clinic, season, timetoer, timetooff) %>% 
+  mutate(rate_exacerb = as.numeric(rate_exacerb)) %>% 
+  mutate(clinic = as.factor(clinic)) %>% 
+  mutate(season = as.factor(season)) %>%  
+  mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", 
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "Mountain West",
+                              clinic=="E" ~ "West Coast",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "West Coast",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Northeast")) %>% 
+  mutate(region_1 = as.factor(region_1)) %>%
+  drop_na()
+
+kruskal.test(timetooff ~ season, data=subset(kw_clinic, region_1=="South" | region_1 == "West Coast" | region_1 == "Mountain West"))
+
+histogram(~ rate_exacerb | clinic, data=kw_clinic)
+
+ggplot(data=kw_clinic, aes(x=season, y=timetoer)) + 
+  geom_boxplot() 

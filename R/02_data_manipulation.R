@@ -1,8 +1,16 @@
 ### import and manipulate data ###
 
+#################################################################################################################################################################
+############################################ initial import and prepping of data - CRN Azithro Study Data Only ##################################################
+#################################################################################################################################################################
+
 # import data
 baseline <- read_sas("data/raw_data/analysis_file_20121231.sas7bdat", 
          NULL)
+
+#################################################################################################################################################################
+################################### Manipulation to Create Center/Region specific Plots including Maps and Plots over Time ######################################
+#################################################################################################################################################################
 
 copd_pre1 <- baseline %>% 
   mutate_at(vars(contains('Days_To_Onset')), funs(date_exac = (. + Rand_Date))) %>% # add days to onset to rand date to get sas date for each exacerbation
@@ -126,6 +134,7 @@ exac_long_full$ninetyday <- as.Date(cut(exac_long_full$date, breaks = "90 days")
 # proportional exacerbation
 exac_long_full <- exac_long_full %>% 
   dplyr::filter(date>"2006-07-01") %>% # remove before July 2006
+  dplyr::filter(date<="2009-11-10") %>% 
   mutate(exacyesno = ifelse(is.na(severity),0,1)) %>% # add marker variable for exacerbation
   mutate(percent_exac = case_when(clinic=="A" ~ exacyesno/enrolled_current_a*100, 
                                   clinic=="B" ~ exacyesno/enrolled_current_b*100,
@@ -166,7 +175,27 @@ exac_grouped_ninety <- exac_long_full %>%
                                clinic=="G" ~ -122.4194,
                                clinic=="H" ~ -83.7430,
                                clinic=="I" ~ -75.1652,
-                               clinic=="J" ~ -79.9959))
+                               clinic=="J" ~ -79.9959)) %>% 
+  mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
+                            clinic=="B" ~ "Birmingham",
+                            clinic=="C" ~ "Boston",
+                            clinic=="D" ~ "Denver",
+                            clinic=="E" ~ "Los Angeles",
+                            clinic=="F" ~ "Minnesota",
+                            clinic=="G" ~ "San Francisco",
+                            clinic=="H" ~ "Michigan",
+                            clinic=="I" ~ "Philadelphia",
+                            clinic=="J" ~ "Pittsburgh")) %>% 
+  mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "Mountain West",
+                              clinic=="E" ~ "West Coast",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "West Coast",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Northeast"))
 
 ## export 90 day csv - for both placebo and azithro
 # write_csv(exac_grouped_ninety, "app/data/exacerbations_grouped_ninety.csv")
@@ -195,7 +224,27 @@ exac_grouped_ninety_placebo <- exac_long_full %>%
                                clinic=="G" ~ -122.4194,
                                clinic=="H" ~ -83.7430,
                                clinic=="I" ~ -75.1652,
-                               clinic=="J" ~ -79.9959))
+                               clinic=="J" ~ -79.9959)) %>% 
+  mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
+                            clinic=="B" ~ "Birmingham",
+                            clinic=="C" ~ "Boston",
+                            clinic=="D" ~ "Denver",
+                            clinic=="E" ~ "Los Angeles",
+                            clinic=="F" ~ "Minnesota",
+                            clinic=="G" ~ "San Francisco",
+                            clinic=="H" ~ "Michigan",
+                            clinic=="I" ~ "Philadelphia",
+                            clinic=="J" ~ "Pittsburgh")) %>% 
+  mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "Mountain West",
+                              clinic=="E" ~ "West Coast",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "West Coast",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Northeast"))
 
 ## export 90 day csv - for placebo
 # write_csv(exac_grouped_ninety_placebo, "app/data/exacerbations_grouped_ninety_placebo.csv")
@@ -224,7 +273,33 @@ exac_grouped_ninety_azithro <- exac_long_full %>%
                                clinic=="G" ~ -122.4194,
                                clinic=="H" ~ -83.7430,
                                clinic=="I" ~ -75.1652,
-                               clinic=="J" ~ -79.9959))
+                               clinic=="J" ~ -79.9959)) %>% 
+  mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
+                            clinic=="B" ~ "Birmingham",
+                            clinic=="C" ~ "Boston",
+                            clinic=="D" ~ "Denver",
+                            clinic=="E" ~ "Los Angeles",
+                            clinic=="F" ~ "Minnesota",
+                            clinic=="G" ~ "San Francisco",
+                            clinic=="H" ~ "Michigan",
+                            clinic=="I" ~ "Philadelphia",
+                            clinic=="J" ~ "Pittsburgh")) %>% 
+  mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "Mountain West",
+                              clinic=="E" ~ "West Coast",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "West Coast",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Northeast"))
 
 ## export 90 day csv - for azithro
 # write_csv(exac_grouped_ninety_azithro, "app/data/exacerbations_grouped_ninety_azithro.csv")
+
+#################################################################################################################################################################
+################################### Manipulation in order to perform center and region specific analyses of outcomes ############################################
+#################################################################################################################################################################
+
+
