@@ -195,7 +195,17 @@ exac_grouped_ninety <- exac_long_full %>%
                               clinic=="G" ~ "West Coast",
                               clinic=="H" ~ "Midwest",
                               clinic=="I" ~ "Northeast",
-                              clinic=="J" ~ "Northeast"))
+                              clinic=="J" ~ "Northeast")) %>% 
+  mutate(region_2 = case_when(clinic=="A" ~ "Northeast", # add region 2
+                              clinic=="B" ~ "South and West",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "South and West",
+                              clinic=="E" ~ "South and West",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "South and West",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Midwest"))
 
 ## export 90 day csv - for both placebo and azithro
 # write_csv(exac_grouped_ninety, "app/data/exacerbations_grouped_ninety.csv")
@@ -244,7 +254,17 @@ exac_grouped_ninety_placebo <- exac_long_full %>%
                               clinic=="G" ~ "West Coast",
                               clinic=="H" ~ "Midwest",
                               clinic=="I" ~ "Northeast",
-                              clinic=="J" ~ "Northeast"))
+                              clinic=="J" ~ "Northeast")) %>% 
+  mutate(region_2 = case_when(clinic=="A" ~ "Northeast", # add region 2
+                              clinic=="B" ~ "South and West",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "South and West",
+                              clinic=="E" ~ "South and West",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "South and West",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Midwest"))
 
 ## export 90 day csv - for placebo
 # write_csv(exac_grouped_ninety_placebo, "app/data/exacerbations_grouped_ninety_placebo.csv")
@@ -293,7 +313,17 @@ exac_grouped_ninety_azithro <- exac_long_full %>%
                               clinic=="G" ~ "West Coast",
                               clinic=="H" ~ "Midwest",
                               clinic=="I" ~ "Northeast",
-                              clinic=="J" ~ "Northeast"))
+                              clinic=="J" ~ "Northeast")) %>% 
+  mutate(region_2 = case_when(clinic=="A" ~ "Northeast", # add region 2
+                              clinic=="B" ~ "South and West",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "South and West",
+                              clinic=="E" ~ "South and West",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "South and West",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Midwest"))
 
 ## export 90 day csv - for azithro
 # write_csv(exac_grouped_ninety_azithro, "app/data/exacerbations_grouped_ninety_azithro.csv")
@@ -302,4 +332,61 @@ exac_grouped_ninety_azithro <- exac_long_full %>%
 ################################### Manipulation in order to perform center and region specific analyses of outcomes ############################################
 #################################################################################################################################################################
 
+# add region options to baseline 
+copd_region <- baseline %>% 
+  mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region 1
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "Mountain West",
+                              clinic=="E" ~ "West Coast",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "West Coast",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Northeast")) %>% 
+  mutate(region_2 = case_when(clinic=="A" ~ "Northeast", # add region 2
+                              clinic=="B" ~ "South and West",
+                              clinic=="C" ~ "Northeast",
+                              clinic=="D" ~ "South and West",
+                              clinic=="E" ~ "South and West",
+                              clinic=="F" ~ "Midwest",
+                              clinic=="G" ~ "South and West",
+                              clinic=="H" ~ "Midwest",
+                              clinic=="I" ~ "Northeast",
+                              clinic=="J" ~ "Midwest")) %>% 
+  mutate(region_3 = case_when(clinic=="A" ~ "South", # add region 3
+                              clinic=="B" ~ "South",
+                              clinic=="C" ~ "North",
+                              clinic=="D" ~ "South",
+                              clinic=="E" ~ "South",
+                              clinic=="F" ~ "North",
+                              clinic=="G" ~ "South",
+                              clinic=="H" ~ "North",
+                              clinic=="I" ~ "North",
+                              clinic=="J" ~ "North")) %>% 
+  mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
+                                 clinic=="B" ~ "Birmingham",
+                                 clinic=="C" ~ "Boston",
+                                 clinic=="D" ~ "Denver",
+                                 clinic=="E" ~ "Los Angeles",
+                                 clinic=="F" ~ "Minnesota",
+                                 clinic=="G" ~ "San Francisco",
+                                 clinic=="H" ~ "Michigan",
+                                 clinic=="I" ~ "Philadelphia",
+                                 clinic=="J" ~ "Pittsburgh")) %>% 
+  mutate(season_name = case_when(season==1 ~ "January to March", # add season names
+                                 season==2 ~ "April to June",
+                                 season==3 ~ "July to September",
+                                 season==4 ~ "October to December")) %>% 
+  mutate(season_d = case_when(season == 1 ~ "Fall and Winter", # add dichotomized season
+                              season == 2 ~ "Spring and Summer",
+                              season == 3 ~ "Spring and Summer",
+                              season == 4 ~ "Fall and Winter")) %>% 
+  mutate(trtgroup_label = ifelse(trtgroup==1,"azithro","placebo")) %>% # add treatment label
+  mutate(exacyesno = ifelse(is.na(Severity_EX1),0,1)) # add yesnoexac to regional data
+
+
+  
+
+## note that additional manipulation of inidividual datasets for limited analyses occurs in respective analysis files ##
 
