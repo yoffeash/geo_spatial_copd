@@ -1,6 +1,6 @@
 ### time to exacerbation ###
 
-### by region - any exacerbation, any season ###
+################################## univariate by region - any exacerbation, any season ##################################
 
 ## entire cohort
 exac_fit_regional <- survfit(Surv(exacerbfolltime, exacerb) ~ region_2, data=copd_region)
@@ -31,7 +31,7 @@ exac_fit_seasonal_ne_azithro <- survfit(Surv(exacerbfolltime, exacerb) ~ season_
 exac_curv_seasonal_ne_azithro <- ggsurvplot(exac_fit_seasonal_ne_azithro, data=subset(copd_region, region_2=="Northeast" & trtgroup_label=="azithro"), pval = TRUE)
 exac_curv_seasonal_ne_azithro
 
-### effect of drug by region ###
+################################## univariate effect of drug by region ##################################
 
 ## entire cohort
 exac_fit_drug <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=copd_region)
@@ -52,3 +52,13 @@ exac_curv_drug_sw
 exac_fit_drug_mw <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_2=="Midwest"))
 exac_curv_drug_mw <- ggsurvplot(exac_fit_drug_mw, data=subset(copd_region, region_2=="Midwest"), pval = TRUE)
 exac_curv_drug_mw
+
+###############################multivariable effect by region##########################################
+copd_region$region_2_f <- as.factor(copd_region$region_2)
+contrasts(copd_region$region_2_f) <- contr.treatment(3, base=1)
+timeto_exac_multi_drug <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
+                                  + goldclass + nowsmk +
+                           trtgroup_label + region_2_f + trtgroup_label*region_2_f, data=copd_region)
+summary(timeto_exac_multi_drug)
+
+
