@@ -11,7 +11,7 @@ exac_curv_regional
 
 ## entire cohort
 exac_fit_seasonal <- survfit(Surv(exacerbfolltime, exacerb) ~ season_name, data=copd_region)
-exac_curv_seasonal <- ggsurvplot(exac_fit_seasonal, data=copd_region, pval = TRUE)
+exac_curv_seasonal <- ggsurvplot(exac_fit_seasonal, data=copd_region, pval = TRUE, risk.table=TRUE)
 exac_curv_seasonal
 
 ### by season - any exacerbation, northeast ###
@@ -35,27 +35,53 @@ exac_curv_seasonal_ne_azithro
 
 ## entire cohort
 exac_fit_drug <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=copd_region)
-exac_curv_drug <- ggsurvplot(exac_fit_drug, data=copd_region, pval = TRUE)
-exac_curv_drug
+exac_curv_drug <- ggsurvplot(exac_fit_drug, data=copd_region, 
+                             pval = TRUE, risk.table = TRUE, risk.table.y.text = FALSE,
+                             legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                             xlim= c(0,365))
+exac_curv_drug$plot <- exac_curv_drug$plot + labs(title = "Entire Cohort")
+exac_curv_drug$plot <- ggpar(exac_curv_drug$plot, font.title = "bold")
+
 
 ## northeast
 exac_fit_drug_ne <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_2=="Northeast"))
-exac_curv_drug_ne <- ggsurvplot(exac_fit_drug_ne, data=subset(copd_region, region_2=="Northeast"), pval = TRUE)
-exac_curv_drug_ne
+exac_curv_drug_ne <- ggsurvplot(exac_fit_drug_ne, data=subset(copd_region, region_2=="Northeast"), pval = TRUE,
+                                risk.table = TRUE, risk.table.y.text = FALSE,
+                                legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                xlim= c(0,365))
+exac_curv_drug_ne$plot <- exac_curv_drug_ne$plot + labs(title = "Northeast")
+exac_curv_drug_ne$plot <- ggpar(exac_curv_drug_ne$plot, font.title = "bold")
+
 
 ## south and west
 exac_fit_drug_sw <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_2=="South and West"))
-exac_curv_drug_sw <- ggsurvplot(exac_fit_drug_sw, data=subset(copd_region, region_2=="South and West"), pval = TRUE)
-exac_curv_drug_sw
+exac_curv_drug_sw <- ggsurvplot(exac_fit_drug_sw, data=subset(copd_region, region_2=="South and West"), pval = TRUE,
+                                risk.table = TRUE, risk.table.y.text = FALSE,
+                                legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                xlim= c(0,365))
+exac_curv_drug_sw$plot <- exac_curv_drug_sw$plot + labs(title = "South and West")
+exac_curv_drug_sw$plot <- ggpar(exac_curv_drug_sw$plot, font.title = "bold")
+
 
 ## midwest
 exac_fit_drug_mw <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_2=="Midwest"))
-exac_curv_drug_mw <- ggsurvplot(exac_fit_drug_mw, data=subset(copd_region, region_2=="Midwest"), pval = TRUE)
-exac_curv_drug_mw
+exac_curv_drug_mw <- ggsurvplot(exac_fit_drug_mw, data=subset(copd_region, region_2=="Midwest"), pval = TRUE,
+                                risk.table = TRUE, risk.table.y.text = FALSE,
+                                legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                xlim= c(0,365))
+exac_curv_drug_mw$plot <- exac_curv_drug_mw$plot + labs(title = "Midwest")
+exac_curv_drug_mw$plot <- ggpar(exac_curv_drug_mw$plot, font.title = "bold")
+
+
+exac_splots_regional <- list()
+exac_splots_regional[[1]] <- exac_curv_drug
+exac_splots_regional[[2]] <- exac_curv_drug_mw
+exac_splots_regional[[3]] <- exac_curv_drug_ne
+exac_splots_regional[[4]] <- exac_curv_drug_sw
+arrange_ggsurvplots(exac_splots_regional, print=TRUE, ncol=2, nrow=2)
 
 ###############################multivariable effect by region##########################################
-copd_region$region_2_f <- as.factor(copd_region$region_2)
-contrasts(copd_region$region_2_f) <- contr.treatment(3, base=1)
+contrasts(copd_region$region_2_f) <- contr.treatment(3, base=1) # midwest as reference group
 timeto_exac_multi_drug <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
                                   + goldclass + nowsmk +
                            trtgroup_label + region_2_f + trtgroup_label*region_2_f, data=copd_region)

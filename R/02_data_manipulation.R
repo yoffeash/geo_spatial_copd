@@ -13,8 +13,9 @@ baseline <- read_sas("data/raw_data/analysis_file_20121231.sas7bdat",
 #################################################################################################################################################################
 
 copd_pre1 <- baseline %>% 
+  filter(time_on_study > 0) %>% 
   mutate_at(vars(contains('Days_To_Onset')), funs(date_exac = (. + Rand_Date))) %>% # add days to onset to rand date to get sas date for each exacerbation
-  select(ID, contains("Severity_EX"), contains("clinic"), Rand_Date, trtgroup, contains("_date_exac")) %>% # select only the severity, clinic and date information
+  dplyr::select(ID, contains("Severity_EX"), contains("clinic"), Rand_Date, trtgroup, contains("_date_exac")) %>% # select only the severity, clinic and date information
   rename_at(vars(contains("Days_To_Onset")), # rename date of exacerbation variables
             funs(sub("Days_To_Onset","dateofexac",.))) %>%
   rename_at(vars(contains("_date_exac")), 
@@ -41,8 +42,8 @@ copd_pre1 <- baseline %>%
                                clinic=="J" ~ -79.9959))
 
 # split into date and severity datasets
-exac_dates_wide <- copd_pre1 %>% select(ID, clinic, nclinic, latitude, longitude, trtgroup, dateofexac1:dateofexac11)
-exac_severity_wide <- copd_pre1 %>% select(ID, clinic, nclinic, latitude, longitude, trtgroup, Severity_EX1:Severity_EX11)
+exac_dates_wide <- copd_pre1 %>% dplyr::select(ID, clinic, nclinic, latitude, longitude, trtgroup, dateofexac1:dateofexac11)
+exac_severity_wide <- copd_pre1 %>% dplyr::select(ID, clinic, nclinic, latitude, longitude, trtgroup, Severity_EX1:Severity_EX11)
 
 # convert wide format date and severity datasets to long
 exac_dates_long <- exac_dates_wide %>% gather(exacnumber, date, dateofexac1:dateofexac11)
@@ -334,6 +335,7 @@ exac_grouped_ninety_azithro <- exac_long_full %>%
 
 # add region options to baseline 
 copd_region <- baseline %>% 
+  filter(time_on_study > 0) %>% 
   mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region 1
                               clinic=="B" ~ "South",
                               clinic=="C" ~ "Northeast",
@@ -384,6 +386,9 @@ copd_region <- baseline %>%
                               season == 4 ~ "Fall and Winter")) %>% 
   mutate(trtgroup_label = ifelse(trtgroup==1,"azithro","placebo")) %>% # add treatment label
   mutate(exacyesno = ifelse(is.na(Severity_EX1),0,1)) # add yesnoexac to regional data
+
+copd_region$region_2_f <- as.factor(copd_region$region_2)
+copd_region$trtgroup_label_f <- as.factor(copd_region$trtgroup_label)
 
 
   
