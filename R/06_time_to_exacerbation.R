@@ -83,7 +83,7 @@ arrange_ggsurvplots(exac_splots_regional, print=TRUE, ncol=2, nrow=2)
 ###############################multivariable effect by region##########################################
 contrasts(copd_region$region_2_f) <- contr.treatment(3, base=1) # midwest as reference group
 timeto_exac_multi_drug <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
-                                  + goldclass + nowsmk +
+                                  + goldclass + nowsmk + latitude +
                            trtgroup_label + region_2_f + trtgroup_label*region_2_f, data=copd_region)
 summary(timeto_exac_multi_drug)
 
