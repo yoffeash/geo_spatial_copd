@@ -19,3 +19,6 @@ region_smok_table <- table(copd_region$region_2, copd_region$nowsmk)
 region_smok_table
 chisq.test(region_smok_table)
 CrossTable(copd_region$region_2, copd_region$nowsmk)
+
+
+t.test(copd_region$Number_Exacerbs~copd_region$region_cluster_2)

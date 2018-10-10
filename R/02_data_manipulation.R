@@ -270,6 +270,12 @@ exac_grouped_ninety_placebo <- exac_long_full %>%
 ## export 90 day csv - for placebo
 # write_csv(exac_grouped_ninety_placebo, "app/data/exacerbations_grouped_ninety_placebo.csv")
 
+## wide format 90 day placebo rate file for clustering 
+exac_grouped_ninety_placebo_wide <- exac_grouped_ninety_placebo %>% 
+  dplyr::select(clinic, clinic_name, ninetyday, total_exac_percent, latitude, longitude) %>% 
+  spread(ninetyday,total_exac_percent, fill=0) %>% 
+  dplyr::select(-'2006-05-30', -'2009-11-10')
+
 # group by 90 day increments and center - for azithro
 exac_grouped_ninety_azithro <- exac_long_full %>% 
   filter(trtgroup_label == "azithro") %>% 
@@ -366,6 +372,26 @@ copd_region <- baseline %>%
                               clinic=="H" ~ "North",
                               clinic=="I" ~ "North",
                               clinic=="J" ~ "North")) %>% 
+  mutate(region_cluster_1 = case_when(clinic=="A" ~ "Cluster A", 
+                                       clinic=="B" ~ "Cluster B",
+                                       clinic=="C" ~ "Cluster A",
+                                       clinic=="D" ~ "Cluster B",
+                                       clinic=="E" ~ "Cluster B",
+                                       clinic=="F" ~ "Cluster A",
+                                       clinic=="G" ~ "Cluster B",
+                                       clinic=="H" ~ "Cluster A",
+                                       clinic=="I" ~ "Cluster C",
+                                       clinic=="J" ~ "Cluster C")) %>%
+  mutate(region_cluster_2 = case_when(clinic=="A" ~ "Cluster B", 
+                                      clinic=="B" ~ "Cluster C",
+                                      clinic=="C" ~ "Cluster B",
+                                      clinic=="D" ~ "Cluster C",
+                                      clinic=="E" ~ "Cluster C",
+                                      clinic=="F" ~ "Cluster B",
+                                      clinic=="G" ~ "Cluster C",
+                                      clinic=="H" ~ "Cluster B",
+                                      clinic=="I" ~ "Cluster B",
+                                      clinic=="J" ~ "Cluster C")) %>%
   mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
                                  clinic=="B" ~ "Birmingham",
                                  clinic=="C" ~ "Boston",
@@ -389,6 +415,8 @@ copd_region <- baseline %>%
 
 copd_region$region_2_f <- as.factor(copd_region$region_2)
 copd_region$trtgroup_label_f <- as.factor(copd_region$trtgroup_label)
+copd_region$region_cluster_1_f <- as.factor(copd_region$region_cluster_1)
+copd_region$region_cluster_2_f <- as.factor(copd_region$region_cluster_2)
 
 
   
