@@ -11,4 +11,4 @@ set.seed(9)
 km = kmeans(exac_grouped_ninety_placebo_wide_pre[,5:17],2)
 exac_grouped_ninety_placebo_wide_clustered <- exac_grouped_ninety_placebo_wide
 exac_grouped_ninety_placebo_wide_clustered$cluster <- as.factor(km$cluster)
-exac_grouped_ninety_placebo_wide_clustered = exac_grouped_ninety_placebo_wide_clustered %>% mutate(cluster_label = ifelse(cluster=="1","B", ifelse(cluster=="2","C","A")))
+exac_grouped_ninety_placebo_wide_clustered = exac_grouped_ninety_placebo_wide_clustered %>% mutate(cluster_label = ifelse(cluster=="1","A", ifelse(cluster=="2","B","C")))

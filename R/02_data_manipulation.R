@@ -339,7 +339,7 @@ exac_grouped_ninety_azithro <- exac_long_full %>%
 ################################### Manipulation in order to perform center and region specific analyses of outcomes ############################################
 #################################################################################################################################################################
 
-# add region options to baseline 
+# add region options to baseline
 copd_region <- baseline %>% 
   filter(time_on_study > 0) %>% 
   mutate(region_1 = case_when(clinic=="A" ~ "Mid-Atlantic", # add region 1
@@ -383,15 +383,15 @@ copd_region <- baseline %>%
                                        clinic=="I" ~ "Cluster C",
                                        clinic=="J" ~ "Cluster C")) %>%
   mutate(region_cluster_2 = case_when(clinic=="A" ~ "Cluster B", 
-                                      clinic=="B" ~ "Cluster C",
+                                      clinic=="B" ~ "Cluster A",
                                       clinic=="C" ~ "Cluster B",
-                                      clinic=="D" ~ "Cluster C",
-                                      clinic=="E" ~ "Cluster C",
+                                      clinic=="D" ~ "Cluster A",
+                                      clinic=="E" ~ "Cluster A",
                                       clinic=="F" ~ "Cluster B",
-                                      clinic=="G" ~ "Cluster C",
+                                      clinic=="G" ~ "Cluster A",
                                       clinic=="H" ~ "Cluster B",
                                       clinic=="I" ~ "Cluster B",
-                                      clinic=="J" ~ "Cluster C")) %>%
+                                      clinic=="J" ~ "Cluster A")) %>%
   mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
                                  clinic=="B" ~ "Birmingham",
                                  clinic=="C" ~ "Boston",
@@ -411,7 +411,8 @@ copd_region <- baseline %>%
                               season == 3 ~ "Spring and Summer",
                               season == 4 ~ "Fall and Winter")) %>% 
   mutate(trtgroup_label = ifelse(trtgroup==1,"azithro","placebo")) %>% # add treatment label
-  mutate(exacyesno = ifelse(is.na(Severity_EX1),0,1)) # add yesnoexac to regional data
+  mutate(exacyesno = ifelse(is.na(Severity_EX1),0,1)) %>% # add yesnoexac to regional data 
+  mutate(priorexac = ifelse(ster1yr==1 | hosp1yr ==1, 1, 0))
 
 copd_region$region_2_f <- as.factor(copd_region$region_2)
 copd_region$trtgroup_label_f <- as.factor(copd_region$trtgroup_label)

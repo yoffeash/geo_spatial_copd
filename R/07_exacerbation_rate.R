@@ -73,16 +73,23 @@ rate_exac_multi_drug <- glm.nb(rate_exacerb ~ age + black + gender + sympF_C00 +
 summary(rate_exac_multi_drug)
 
 #######################################################################By objective Clustering#######################################################################
+# cluster a
+rate_exac_drug_a <- glm.nb(rate_exacerb ~ trtgroup_label_f + age + black + gender + sympF_C00 + activity_C00 + impactF_C00 + goldclass + nowsmk + latitude + priorexac, 
+                            data=subset(copd_region_num, region_cluster_2 == "Cluster A"))
+summary(rate_exac_drug_a)
+cbind(IRR = exp(coef(rate_exac_drug_a)), 
+      exp(confint(rate_exac_drug_a)))[2,]
 
+# cluster b
+rate_exac_drug_b <- glm.nb(rate_exacerb ~ trtgroup_label_f + age + black + gender + sympF_C00 + activity_C00 + impactF_C00 + goldclass + nowsmk + latitude + priorexac, 
+                            data=subset(copd_region_num, region_cluster_2 == "Cluster B"))
+summary(rate_exac_drug_b)
+cbind(IRR = exp(coef(rate_exac_drug_b)), 
+      exp(confint(rate_exac_drug_b)))[2,]
 
 ### multivariable rate with interaction term for region and treatment
-rate_exac_multi_drug_cluster <- zeroinfl(Number_Exacerbs ~ age + goldclass + nowsmk +
-                                   trtgroup_label + region_cluster_1_f + trtgroup_label*region_cluster_1_f | trtgroup_label, 
-                                 data=copd_region_num, dist="negbin", offset=l_time_on_study, EM=TRUE)
-summary(rate_exac_multi_drug)
-
-contrasts(copd_region_num$region_cluster_2_f) <- contr.treatment(3, base=1) # midwest as reference group
-rate_exac_multi_drug <- glm.nb(rate_exacerb ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 + goldclass + nowsmk + latitude +
+contrasts(copd_region_num$region_cluster_2_f) <- contr.treatment(2, base=1) 
+rate_exac_multi_drug <- glm.nb(rate_exacerb ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 + goldclass + nowsmk + latitude + priorexac +
                                  trtgroup_label + region_cluster_2_f + trtgroup_label*region_cluster_2_f, 
                                data=copd_region_num)
 summary(rate_exac_multi_drug)

@@ -89,14 +89,14 @@ summary(timeto_exac_multi_drug)
 
 
 #######################################################################By objective Clustering#######################################################################
-## cluster a
+## cluster a - note as currently structured only using 2 cluster solution 
 exac_fit_drug_cluster_a <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_2=="Cluster A"))
 exac_curve_drug_cluster_a <- ggsurvplot(exac_fit_drug_cluster_a, data=subset(copd_region, region_cluster_2_f=="Cluster A"), pval = TRUE,
                                 risk.table = TRUE, risk.table.y.text = FALSE,
                                 legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
                                 xlim= c(0,365))
 exac_curve_drug_cluster_a$plot <- exac_curve_drug_cluster_a$plot + labs(title = "Cluster A")
-exac_curve_drug_cluster_a$plot <- ggpar(exac_curve_drug_cluster_a$plot, font.title = "bold")
+exac_curve_drug_cluster_a$plot <- ggpar(exac_curve_drug_cluster_a$plot, font.title = "bold") + ylab("Proportion without Exacerbation")
 exac_curve_drug_cluster_a
 
 
@@ -106,26 +106,20 @@ exac_curve_drug_cluster_b <- ggsurvplot(exac_fit_drug_cluster_b, data=subset(cop
                                         risk.table = TRUE, risk.table.y.text = FALSE,
                                         legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
                                         xlim= c(0,365))
-exac_curve_drug_cluster_b$plot <- exac_curve_drug_cluster_b$plot + labs(title = "Cluster B")
+exac_curve_drug_cluster_b$plot <- exac_curve_drug_cluster_b$plot + labs(title = "Cluster B") + ylab("Proportion without Exacerbation")
 exac_curve_drug_cluster_b$plot <- ggpar(exac_curve_drug_cluster_b$plot, font.title = "bold")
 exac_curve_drug_cluster_b
 
-
-## cluster c
-exac_fit_drug_cluster_c <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_2=="Cluster C"))
-exac_curve_drug_cluster_c <- ggsurvplot(exac_fit_drug_cluster_c, data=subset(copd_region, region_cluster_2_f=="Cluster C"), pval = TRUE,
-                                        risk.table = TRUE, risk.table.y.text = FALSE,
-                                        legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
-                                        xlim= c(0,365))
-exac_curve_drug_cluster_c$plot <- exac_curve_drug_cluster_c$plot + labs(title = "Cluster C")
-exac_curve_drug_cluster_c$plot <- ggpar(exac_curve_drug_cluster_c$plot, font.title = "bold")
-exac_curve_drug_cluster_c
+exac_splots_regional_cluster <- list()
+exac_splots_regional_cluster[[1]] <- exac_curve_drug_cluster_a
+exac_splots_regional_cluster[[2]] <- exac_curve_drug_cluster_b
+arrange_ggsurvplots(exac_splots_regional_cluster, print=TRUE, ncol=2, nrow=1)
 
 
-###############################multivariable effect by region##########################################
+###############################multivariable effect by cluster##########################################
 contrasts(copd_region$region_cluster_2_f) <- contr.treatment(2, base=1)
 timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
-                                  goldclass + nowsmk + latitude
+                                  goldclass + nowsmk + latitude + priorexac +
                                   trtgroup_label + region_cluster_2_f + trtgroup_label*region_cluster_2_f, data=copd_region)
 summary(timeto_exac_multi_drug_cluster)
 
