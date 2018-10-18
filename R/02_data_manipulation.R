@@ -1,4 +1,4 @@
-### import and manipulate data ###
+### import and manipulate data from MACRO ###
 
 #################################################################################################################################################################
 ############################################ initial import and prepping of data - CRN Azithro Study Data Only ##################################################
@@ -392,6 +392,16 @@ copd_region <- baseline %>%
                                       clinic=="H" ~ "Cluster B",
                                       clinic=="I" ~ "Cluster B",
                                       clinic=="J" ~ "Cluster A")) %>%
+  mutate(region_cluster_h_1 = case_when(clinic=="A" ~ "Cluster A", 
+                                         clinic=="B" ~ "Cluster A",
+                                         clinic=="C" ~ "Cluster B",
+                                         clinic=="D" ~ "Cluster A",
+                                         clinic=="E" ~ "Cluster A",
+                                         clinic=="F" ~ "Cluster B",
+                                         clinic=="G" ~ "Cluster A",
+                                         clinic=="H" ~ "Cluster B",
+                                         clinic=="I" ~ "Cluster B",
+                                         clinic=="J" ~ "Cluster A")) %>% 
   mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
                                  clinic=="B" ~ "Birmingham",
                                  clinic=="C" ~ "Boston",
@@ -418,7 +428,7 @@ copd_region$region_2_f <- as.factor(copd_region$region_2)
 copd_region$trtgroup_label_f <- as.factor(copd_region$trtgroup_label)
 copd_region$region_cluster_1_f <- as.factor(copd_region$region_cluster_1)
 copd_region$region_cluster_2_f <- as.factor(copd_region$region_cluster_2)
-
+copd_region$region_cluster_h_1_f <- as.factor(copd_region$region_cluster_h_1)
 
   
 

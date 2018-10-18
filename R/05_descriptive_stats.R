@@ -45,7 +45,7 @@ chisq.test(region_smok_table)
 CrossTable(copd_region$region_cluster_2, copd_region$nowsmk)
 
 ## difference in number of exacerbations 
-t.test(copd_region$Number_Exacerbs~copd_region$region_cluster_2)
+t.test(copd_region$Number_Exacerbs~copd_region$region_cluster_h_1)
 
 ## difference in exacerbation rate by cluster
 exac_rate_cluster <- exac_grouped_ninety_placebo_wide_clustered %>% 

@@ -99,10 +99,28 @@ exac_curve_drug_cluster_a$plot <- exac_curve_drug_cluster_a$plot + labs(title = 
 exac_curve_drug_cluster_a$plot <- ggpar(exac_curve_drug_cluster_a$plot, font.title = "bold") + ylab("Proportion without Exacerbation")
 exac_curve_drug_cluster_a
 
+exac_fit_drug_cluster_a <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_h_1=="Cluster A"))
+exac_curve_drug_cluster_a <- ggsurvplot(exac_fit_drug_cluster_a, data=subset(copd_region, region_cluster_h_1_f=="Cluster A"), pval = TRUE,
+                                        risk.table = TRUE, risk.table.y.text = FALSE,
+                                        legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                        xlim= c(0,365))
+exac_curve_drug_cluster_a$plot <- exac_curve_drug_cluster_a$plot + labs(title = "Cluster A")
+exac_curve_drug_cluster_a$plot <- ggpar(exac_curve_drug_cluster_a$plot, font.title = "bold") + ylab("Proportion without Exacerbation")
+exac_curve_drug_cluster_a
+
 
 ## cluster b
 exac_fit_drug_cluster_b <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_2=="Cluster B"))
 exac_curve_drug_cluster_b <- ggsurvplot(exac_fit_drug_cluster_b, data=subset(copd_region, region_cluster_2_f=="Cluster B"), pval = TRUE,
+                                        risk.table = TRUE, risk.table.y.text = FALSE,
+                                        legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                        xlim= c(0,365))
+exac_curve_drug_cluster_b$plot <- exac_curve_drug_cluster_b$plot + labs(title = "Cluster B") + ylab("Proportion without Exacerbation")
+exac_curve_drug_cluster_b$plot <- ggpar(exac_curve_drug_cluster_b$plot, font.title = "bold")
+exac_curve_drug_cluster_b
+
+exac_fit_drug_cluster_b <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_h_1=="Cluster B"))
+exac_curve_drug_cluster_b <- ggsurvplot(exac_fit_drug_cluster_b, data=subset(copd_region, region_cluster_h_1_f=="Cluster B"), pval = TRUE,
                                         risk.table = TRUE, risk.table.y.text = FALSE,
                                         legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
                                         xlim= c(0,365))
@@ -121,6 +139,12 @@ contrasts(copd_region$region_cluster_2_f) <- contr.treatment(2, base=1)
 timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
                                   goldclass + nowsmk + latitude + priorexac +
                                   trtgroup_label + region_cluster_2_f + trtgroup_label*region_cluster_2_f, data=copd_region)
+summary(timeto_exac_multi_drug_cluster)
+
+contrasts(copd_region$region_cluster_h_1_f) <- contr.treatment(2, base=1)
+timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
+                                          goldclass + nowsmk + latitude + priorexac +
+                                          trtgroup_label + region_cluster_h_1_f + trtgroup_label*region_cluster_h_1_f, data=copd_region)
 summary(timeto_exac_multi_drug_cluster)
 
 
