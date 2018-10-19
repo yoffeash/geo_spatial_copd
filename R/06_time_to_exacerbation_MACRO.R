@@ -143,8 +143,8 @@ exac_curve_drug_cluster_c
 exac_splots_regional_cluster <- list()
 exac_splots_regional_cluster[[1]] <- exac_curve_drug_cluster_a
 exac_splots_regional_cluster[[2]] <- exac_curve_drug_cluster_b
-exac_splots_regional_cluster[[3]] <- exac_curve_drug_cluster_c
-arrange_ggsurvplots(exac_splots_regional_cluster, print=TRUE, ncol=2, nrow=2)
+# exac_splots_regional_cluster[[3]] <- exac_curve_drug_cluster_c
+arrange_ggsurvplots(exac_splots_regional_cluster, print=TRUE, ncol=2, nrow=1)
 
 
 ###############################multivariable effect by cluster##########################################
@@ -156,7 +156,7 @@ summary(timeto_exac_multi_drug_cluster)
 
 contrasts(copd_region$region_cluster_h_1_f) <- contr.treatment(2, base=1)
 timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
-                                          goldclass + nowsmk + latitude + priorexac + season +
+                                          goldclass + nowsmk + latitude + priorexac + season + oxygen +
                                           trtgroup_label + region_cluster_h_1_f + trtgroup_label*region_cluster_h_1_f, data=copd_region)
 summary(timeto_exac_multi_drug_cluster)
 
