@@ -1,5 +1,6 @@
 ### libraries ###
 
+library(data.table)
 library(tidyverse)
 library(janitor)
 library(haven)
@@ -23,3 +24,4 @@ library(cowplot)
 library(gmodels)
 library(ggfortify)
 library(dtwclust)
+

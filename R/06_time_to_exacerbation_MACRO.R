@@ -128,10 +128,23 @@ exac_curve_drug_cluster_b$plot <- exac_curve_drug_cluster_b$plot + labs(title = 
 exac_curve_drug_cluster_b$plot <- ggpar(exac_curve_drug_cluster_b$plot, font.title = "bold")
 exac_curve_drug_cluster_b
 
+
+## cluster c when used
+exac_fit_drug_cluster_c <- survfit(Surv(exacerbfolltime, exacerb) ~ trtgroup_label, data=subset(copd_region, region_cluster_h_1=="Cluster C"))
+exac_curve_drug_cluster_c <- ggsurvplot(exac_fit_drug_cluster_c, data=subset(copd_region, region_cluster_h_1_f=="Cluster C"), pval = TRUE,
+                                        risk.table = TRUE, risk.table.y.text = FALSE,
+                                        legend.labs = c("Azithro","Placebo"), risk.table.height = 0.25, 
+                                        xlim= c(0,365))
+exac_curve_drug_cluster_c$plot <- exac_curve_drug_cluster_c$plot + labs(title = "Cluster C") + ylab("Proportion without Exacerbation")
+exac_curve_drug_cluster_c$plot <- ggpar(exac_curve_drug_cluster_c$plot, font.title = "bold")
+exac_curve_drug_cluster_c
+
+# multiple cluster plot
 exac_splots_regional_cluster <- list()
 exac_splots_regional_cluster[[1]] <- exac_curve_drug_cluster_a
 exac_splots_regional_cluster[[2]] <- exac_curve_drug_cluster_b
-arrange_ggsurvplots(exac_splots_regional_cluster, print=TRUE, ncol=2, nrow=1)
+exac_splots_regional_cluster[[3]] <- exac_curve_drug_cluster_c
+arrange_ggsurvplots(exac_splots_regional_cluster, print=TRUE, ncol=2, nrow=2)
 
 
 ###############################multivariable effect by cluster##########################################
@@ -143,7 +156,7 @@ summary(timeto_exac_multi_drug_cluster)
 
 contrasts(copd_region$region_cluster_h_1_f) <- contr.treatment(2, base=1)
 timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
-                                          goldclass + nowsmk + latitude + priorexac +
+                                          goldclass + nowsmk + latitude + priorexac + season +
                                           trtgroup_label + region_cluster_h_1_f + trtgroup_label*region_cluster_h_1_f, data=copd_region)
 summary(timeto_exac_multi_drug_cluster)
 
