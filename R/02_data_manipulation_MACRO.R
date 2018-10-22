@@ -394,14 +394,14 @@ copd_region <- baseline %>%
                                       clinic=="J" ~ "Cluster A")) %>%
   mutate(region_cluster_h_1 = case_when(clinic=="A" ~ "Cluster A", 
                                          clinic=="B" ~ "Cluster B",
-                                         clinic=="C" ~ "Cluster B",
-                                         clinic=="D" ~ "Cluster A",
-                                         clinic=="E" ~ "Cluster A",
+                                         clinic=="C" ~ "Cluster A",
+                                         clinic=="D" ~ "Cluster B",
+                                         clinic=="E" ~ "Cluster B",
                                          clinic=="F" ~ "Cluster A",
                                          clinic=="G" ~ "Cluster B",
-                                         clinic=="H" ~ "Cluster B",
+                                         clinic=="H" ~ "Cluster A",
                                          clinic=="I" ~ "Cluster A",
-                                         clinic=="J" ~ "Cluster A")) %>% 
+                                         clinic=="J" ~ "Cluster B")) %>% 
   mutate(clinic_name = case_when(clinic=="A" ~ "Maryland", # change clinic to name of center
                                  clinic=="B" ~ "Birmingham",
                                  clinic=="C" ~ "Boston",

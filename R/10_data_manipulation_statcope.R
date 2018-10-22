@@ -178,10 +178,20 @@ exac_grouped_ninety_stat <- exac_long_full_stat %>%
   group_by(clinic, ninetyday) %>% 
   summarize(total_exac_percent = sum(percent_exac, na.rm=TRUE), mean_severity = mean(severity, na.rm=TRUE))
   
-## wide format 90 day placebo rate file for clustering 
+## wide format 90 day rate file for clustering 
 exac_grouped_ninety_wide_stat <- exac_grouped_ninety_stat %>% 
   dplyr::select(clinic, ninetyday, total_exac_percent) %>% 
   spread(ninetyday,total_exac_percent, fill=0)
+
+# group by quarter increments and center - for both placebo and azithro
+exac_grouped_quarter_stat <- exac_long_full_stat %>% 
+  group_by(clinic, quarter) %>% 
+  summarize(total_exac_percent = sum(percent_exac, na.rm=TRUE), mean_severity = mean(severity, na.rm=TRUE))
+
+## wide format quarter rate file for clustering 
+exac_grouped_quarter_wide_stat <- exac_grouped_quarter_stat %>% 
+  dplyr::select(clinic, quarter, total_exac_percent) %>% 
+  spread(quarter,total_exac_percent, fill=0)
 
 
 stat_pre1 <- baseline_stat %>% filter(DaysInStudy > 0) %>% # remove those who have days in study < 0

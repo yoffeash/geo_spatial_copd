@@ -154,7 +154,7 @@ timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + b
                                   trtgroup_label + region_cluster_2_f + trtgroup_label*region_cluster_2_f, data=copd_region)
 summary(timeto_exac_multi_drug_cluster)
 
-contrasts(copd_region$region_cluster_h_1_f) <- contr.treatment(2, base=1)
+contrasts(copd_region$region_cluster_h_1_f) <- contr.treatment(3, base=1)
 timeto_exac_multi_drug_cluster <- coxph(Surv(exacerbfolltime, exacerb) ~ age + black + gender + sympF_C00 + activity_C00 + impactF_C00 +
                                           goldclass + nowsmk + latitude + priorexac + season + oxygen +
                                           trtgroup_label + region_cluster_h_1_f + trtgroup_label*region_cluster_h_1_f, data=copd_region)
