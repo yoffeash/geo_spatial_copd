@@ -91,6 +91,6 @@ cutree(hc.single, 3)
 
 # fuzzy using DTW
 # http://www.stat.unc.edu/faculty/pipiras/timeseries/Multivariate_6_-_Classification_Clustering_-_Menu.html#clustering_algorithms_(for_time_series_objects)
-hc_DTW <- tsclust(x, type = "fuzzy", k = 2, distance = "dtw", seed=9)
+hc_DTW <- tsclust(x, type = "fuzzy", k = 2, distance = "sbd", seed=9)
 plot(hc_DTW)
 hc_DTW@cluster
