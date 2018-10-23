@@ -199,15 +199,16 @@ stat_pre1 <- baseline_stat %>% filter(DaysInStudy > 0) %>% # remove those who ha
   mutate(days_to_ex_1 = ifelse(is.na(Days_To_Onset1),DaysInStudy,Days_To_Onset1)) %>% 
   mutate(clinic=substr(SubClinic,1,1)) %>% 
   mutate(exacerb = ifelse(is.na(Severity_EX1),0,1)) %>% 
-  mutate(region_cluster_h_1 = case_when(clinic=="A" ~ "Cluster B", 
-                                        clinic=="B" ~ "Cluster B",
-                                        clinic=="C" ~ "Cluster A",
+  mutate(region_cluster_h_1 = case_when(clinic=="A" ~ "Cluster C", 
+                                        clinic=="B" ~ "Cluster A",
+                                        clinic=="C" ~ "Cluster C",
                                         clinic=="D" ~ "Cluster B",
                                         clinic=="E" ~ "Cluster A",
-                                        clinic=="F" ~ "Cluster A",
-                                        clinic=="G" ~ "Cluster A",
-                                        clinic=="H" ~ "Cluster B",
-                                        clinic=="I" ~ "Cluster A",
+                                        clinic=="F" ~ "Cluster C",
+                                        clinic=="G" ~ "Cluster B",
+                                        clinic=="H" ~ "Cluster C",
+                                        clinic=="I" ~ "Cluster C",
                                         clinic=="J" ~ "Cluster B"))
  
+
 

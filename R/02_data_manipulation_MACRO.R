@@ -65,67 +65,104 @@ exac_long <- exac_long %>%
   mutate(date = as.Date(date, origin='1960-01-01')) %>% 
   arrange(date) # sort by date
 
-# add list of all months between start (2006-03-17) and end (2010-04-02)
-date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-04-30"), by="days"))
 
-# load dataset with dates from 3/1/06 to 4/30/10 with enrollment by clinic
-enrollment_by_month_pre1 <- read_excel("data/raw_data/enrollment_by_clinic.xlsx")
-enrollment_by_month_pre1 <- enrollment_by_month_pre1 %>% mutate(date=as.Date(date))
-
-# add month column to enrollment data
-enrollment_by_month_pre1$month <- as.Date(cut(enrollment_by_month_pre1$date, breaks = "month"))
-
-# add the raw number enrolled each month (not cumulative) by center
-enrollment_by_month_pre2 <- enrollment_by_month_pre1 %>% 
-  group_by(month) %>% filter(date==min(date)) # keep only the first value for each month
+###### calculating monthly enrollment - very inelegant solution ####
+enrollment_by_month_pre1 <- baseline %>% 
+  filter(Days_In_Study > 0) %>% 
+  dplyr::select(ID,Rand_Date,Days_In_Study,clinic) %>% 
+  mutate(EndDate = Rand_Date + Days_In_Study) %>% 
+  mutate(date_randomized = as.Date(Rand_Date, origin='1960-01-01')) %>% 
+  mutate(date_end = as.Date(EndDate, origin='1960-01-01')) %>% 
   
-enrollment_by_month_pre3 <- enrollment_by_month_pre2 %>% ungroup() %>% 
-  mutate(delta_enroll_a = enrollment_clinic_a - lag(enrollment_clinic_a, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_b = enrollment_clinic_b - lag(enrollment_clinic_b, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_c = enrollment_clinic_c - lag(enrollment_clinic_c, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_d = enrollment_clinic_d - lag(enrollment_clinic_d, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_e = enrollment_clinic_e - lag(enrollment_clinic_e, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_f = enrollment_clinic_f - lag(enrollment_clinic_f, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_g = enrollment_clinic_g - lag(enrollment_clinic_g, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_h = enrollment_clinic_h - lag(enrollment_clinic_h, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_i = enrollment_clinic_i - lag(enrollment_clinic_i, default=0, order_by = month)) %>% 
-  mutate(delta_enroll_j = enrollment_clinic_j - lag(enrollment_clinic_j, default=0, order_by = month)) 
+  mutate(enrolled_2006_03_01 = ifelse(date_randomized<as.Date('2006-04-01') & date_end>=as.Date('2006-03-01'),1,0)) %>% 
+  mutate(enrolled_2006_04_01 = ifelse(date_randomized<as.Date('2006-05-01') & date_end>=as.Date('2006-04-01'),1,0)) %>%
+  mutate(enrolled_2006_05_01 = ifelse(date_randomized<as.Date('2006-06-01') & date_end>=as.Date('2006-05-01'),1,0)) %>%
+  mutate(enrolled_2006_06_01 = ifelse(date_randomized<as.Date('2006-07-01') & date_end>=as.Date('2006-06-01'),1,0)) %>% 
+  mutate(enrolled_2006_07_01 = ifelse(date_randomized<as.Date('2006-08-01') & date_end>=as.Date('2006-07-01'),1,0)) %>% 
+  mutate(enrolled_2006_08_01 = ifelse(date_randomized<as.Date('2006-09-01') & date_end>=as.Date('2006-08-01'),1,0)) %>% 
+  mutate(enrolled_2006_09_01 = ifelse(date_randomized<as.Date('2006-10-01') & date_end>=as.Date('2006-09-01'),1,0)) %>% 
+  mutate(enrolled_2006_10_01 = ifelse(date_randomized<as.Date('2006-11-01') & date_end>=as.Date('2006-10-01'),1,0)) %>% 
+  mutate(enrolled_2006_11_01 = ifelse(date_randomized<as.Date('2006-12-01') & date_end>=as.Date('2006-11-01'),1,0)) %>%
+  mutate(enrolled_2006_12_01 = ifelse(date_randomized<as.Date('2007-01-01') & date_end>=as.Date('2006-12-01'),1,0)) %>%
+  
+  mutate(enrolled_2007_01_01 = ifelse(date_randomized<as.Date('2007-02-01') & date_end>=as.Date('2007-01-01'),1,0)) %>% 
+  mutate(enrolled_2007_02_01 = ifelse(date_randomized<as.Date('2007-03-01') & date_end>=as.Date('2007-02-01'),1,0)) %>% 
+  mutate(enrolled_2007_03_01 = ifelse(date_randomized<as.Date('2007-04-01') & date_end>=as.Date('2007-03-01'),1,0)) %>% 
+  mutate(enrolled_2007_04_01 = ifelse(date_randomized<as.Date('2007-05-01') & date_end>=as.Date('2007-04-01'),1,0)) %>%
+  mutate(enrolled_2007_05_01 = ifelse(date_randomized<as.Date('2007-06-01') & date_end>=as.Date('2007-05-01'),1,0)) %>% 
+  mutate(enrolled_2007_06_01 = ifelse(date_randomized<as.Date('2007-07-01') & date_end>=as.Date('2007-06-01'),1,0)) %>%
+  mutate(enrolled_2007_07_01 = ifelse(date_randomized<as.Date('2007-08-01') & date_end>=as.Date('2007-07-01'),1,0)) %>% 
+  mutate(enrolled_2007_08_01 = ifelse(date_randomized<as.Date('2007-09-01') & date_end>=as.Date('2007-08-01'),1,0)) %>%
+  mutate(enrolled_2007_09_01 = ifelse(date_randomized<as.Date('2007-10-01') & date_end>=as.Date('2007-09-01'),1,0)) %>% 
+  mutate(enrolled_2007_10_01 = ifelse(date_randomized<as.Date('2007-11-01') & date_end>=as.Date('2007-10-01'),1,0)) %>%
+  mutate(enrolled_2007_11_01 = ifelse(date_randomized<as.Date('2007-12-01') & date_end>=as.Date('2007-11-01'),1,0)) %>% 
+  mutate(enrolled_2007_12_01 = ifelse(date_randomized<as.Date('2018-01-01') & date_end>=as.Date('2007-12-01'),1,0)) %>%
+  
+  mutate(enrolled_2008_01_01 = ifelse(date_randomized<as.Date('2008-02-01') & date_end>=as.Date('2008-01-01'),1,0)) %>% 
+  mutate(enrolled_2008_02_01 = ifelse(date_randomized<as.Date('2008-03-01') & date_end>=as.Date('2008-02-01'),1,0)) %>% 
+  mutate(enrolled_2008_03_01 = ifelse(date_randomized<as.Date('2008-04-01') & date_end>=as.Date('2008-03-01'),1,0)) %>% 
+  mutate(enrolled_2008_04_01 = ifelse(date_randomized<as.Date('2008-05-01') & date_end>=as.Date('2008-04-01'),1,0)) %>%
+  mutate(enrolled_2008_05_01 = ifelse(date_randomized<as.Date('2008-06-01') & date_end>=as.Date('2008-05-01'),1,0)) %>% 
+  mutate(enrolled_2008_06_01 = ifelse(date_randomized<as.Date('2008-07-01') & date_end>=as.Date('2008-06-01'),1,0)) %>%
+  mutate(enrolled_2008_07_01 = ifelse(date_randomized<as.Date('2008-08-01') & date_end>=as.Date('2008-07-01'),1,0)) %>% 
+  mutate(enrolled_2008_08_01 = ifelse(date_randomized<as.Date('2008-09-01') & date_end>=as.Date('2008-08-01'),1,0)) %>%
+  mutate(enrolled_2008_09_01 = ifelse(date_randomized<as.Date('2008-10-01') & date_end>=as.Date('2008-09-01'),1,0)) %>% 
+  mutate(enrolled_2008_10_01 = ifelse(date_randomized<as.Date('2008-11-01') & date_end>=as.Date('2008-10-01'),1,0)) %>%
+  mutate(enrolled_2008_11_01 = ifelse(date_randomized<as.Date('2008-12-01') & date_end>=as.Date('2008-11-01'),1,0)) %>% 
+  mutate(enrolled_2008_12_01 = ifelse(date_randomized<as.Date('2009-01-01') & date_end>=as.Date('2008-12-01'),1,0)) %>%
+  
+  mutate(enrolled_2009_01_01 = ifelse(date_randomized<as.Date('2009-02-01') & date_end>=as.Date('2009-01-01'),1,0)) %>% 
+  mutate(enrolled_2009_02_01 = ifelse(date_randomized<as.Date('2009-03-01') & date_end>=as.Date('2009-02-01'),1,0)) %>% 
+  mutate(enrolled_2009_03_01 = ifelse(date_randomized<as.Date('2009-04-01') & date_end>=as.Date('2009-03-01'),1,0)) %>% 
+  mutate(enrolled_2009_04_01 = ifelse(date_randomized<as.Date('2009-05-01') & date_end>=as.Date('2009-04-01'),1,0)) %>%
+  mutate(enrolled_2009_05_01 = ifelse(date_randomized<as.Date('2009-06-01') & date_end>=as.Date('2009-05-01'),1,0)) %>% 
+  mutate(enrolled_2009_06_01 = ifelse(date_randomized<as.Date('2009-07-01') & date_end>=as.Date('2009-06-01'),1,0)) %>%
+  mutate(enrolled_2009_07_01 = ifelse(date_randomized<as.Date('2009-08-01') & date_end>=as.Date('2009-07-01'),1,0)) %>% 
+  mutate(enrolled_2009_08_01 = ifelse(date_randomized<as.Date('2009-09-01') & date_end>=as.Date('2009-08-01'),1,0)) %>%
+  mutate(enrolled_2009_09_01 = ifelse(date_randomized<as.Date('2009-10-01') & date_end>=as.Date('2009-09-01'),1,0)) %>% 
+  mutate(enrolled_2009_10_01 = ifelse(date_randomized<as.Date('2009-11-01') & date_end>=as.Date('2009-10-01'),1,0)) %>%
+  mutate(enrolled_2009_11_01 = ifelse(date_randomized<as.Date('2009-12-01') & date_end>=as.Date('2009-11-01'),1,0)) %>% 
+  mutate(enrolled_2009_12_01 = ifelse(date_randomized<as.Date('2010-01-01') & date_end>=as.Date('2009-12-01'),1,0)) %>%
+  
+  mutate(enrolled_2010_01_01 = ifelse(date_randomized<as.Date('2010-02-01') & date_end>=as.Date('2010-01-01'),1,0)) %>% 
+  mutate(enrolled_2010_02_01 = ifelse(date_randomized<as.Date('2010-03-01') & date_end>=as.Date('2010-02-01'),1,0)) %>% 
+  mutate(enrolled_2010_03_01 = ifelse(date_randomized<as.Date('2010-04-01') & date_end>=as.Date('2010-03-01'),1,0)) %>% 
+  mutate(enrolled_2010_04_01 = ifelse(date_randomized<as.Date('2010-05-01') & date_end>=as.Date('2010-04-01'),1,0)) %>%
+  mutate(enrolled_2010_05_01 = ifelse(date_randomized<as.Date('2010-06-01') & date_end>=as.Date('2010-05-01'),1,0))
 
-# add the cumulative enrollment over the preceding 12 months
-enrollment_by_month_pre4 <- enrollment_by_month_pre3 %>% 
-  arrange(month) %>% 
-  mutate(enrolled_current_a = rollapplyr(delta_enroll_a, 12, sum, partial=TRUE)) %>%
-  mutate(enrolled_current_b = rollapplyr(delta_enroll_b, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_c = rollapplyr(delta_enroll_c, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_d = rollapplyr(delta_enroll_d, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_e = rollapplyr(delta_enroll_e, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_f = rollapplyr(delta_enroll_f, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_g = rollapplyr(delta_enroll_g, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_h = rollapplyr(delta_enroll_h, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_i = rollapplyr(delta_enroll_i, 12, sum, partial=TRUE)) %>% 
-  mutate(enrolled_current_j = rollapplyr(delta_enroll_j, 12, sum, partial=TRUE))
 
+# wide format with enrollment by month  
+enrollment_grouped_macro <- enrollment_by_month_pre1 %>% 
+  dplyr::select(clinic,contains("enrolled_")) %>% 
+  dplyr::group_by(clinic) %>% 
+  dplyr::summarise_all(funs(sum)) %>% 
+  rename_at(vars(contains("enrolled")), 
+              funs(sub("enrolled_","",.))) %>% 
+  gather(month,enrolled,2:52)
+  
+enrollment_grouped_macro$month <- str_replace_all(enrollment_grouped_macro$month,'_','-')
+  
+enrollment_grouped_macro <- enrollment_grouped_macro %>% spread(clinic, enrolled) %>% mutate(date=as.Date(month)) %>% dplyr::select(-month)
+  
 # add list of all months between start (2006-03-17) and end (2010-04-02)
-date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-04-30"), by="days"))
-
-# merge empty date list with enrollment by month
-enrollment_pre1 <- left_join(date_empty,enrollment_by_month_pre4)
-
-# fill in enrollment numbers
-enrollment_by_month <- enrollment_pre1 %>% 
-  mutate(enrolled_current_a = zoo::na.locf(enrolled_current_a, na.rm=T)) %>%
-  mutate(enrolled_current_b = zoo::na.locf(enrolled_current_b, na.rm=T)) %>%
-  mutate(enrolled_current_c = zoo::na.locf(enrolled_current_c, na.rm=T)) %>%
-  mutate(enrolled_current_d = zoo::na.locf(enrolled_current_d, na.rm=T)) %>%
-  mutate(enrolled_current_e = zoo::na.locf(enrolled_current_e, na.rm=T)) %>%
-  mutate(enrolled_current_f = zoo::na.locf(enrolled_current_f, na.rm=T)) %>%
-  mutate(enrolled_current_g = zoo::na.locf(enrolled_current_g, na.rm=T)) %>%
-  mutate(enrolled_current_h = zoo::na.locf(enrolled_current_h, na.rm=T)) %>%
-  mutate(enrolled_current_i = zoo::na.locf(enrolled_current_i, na.rm=T)) %>%
-  mutate(enrolled_current_j = zoo::na.locf(enrolled_current_j, na.rm=T))
+date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-05-30"), by="days"))
+  
+enrollment_macro_pre2 <- left_join(date_empty,enrollment_grouped_macro)  
+  
+enrollment_by_month_macro <- enrollment_macro_pre2 %>% 
+  mutate(A = zoo::na.locf(A, na.rm=T)) %>%
+  mutate(B = zoo::na.locf(B, na.rm=T)) %>%
+  mutate(C = zoo::na.locf(C, na.rm=T)) %>%
+  mutate(D = zoo::na.locf(D, na.rm=T)) %>%
+  mutate(E = zoo::na.locf(E, na.rm=T)) %>%
+  mutate(F = zoo::na.locf(F, na.rm=T)) %>%
+  mutate(G = zoo::na.locf(G, na.rm=T)) %>%
+  mutate(H = zoo::na.locf(H, na.rm=T)) %>%
+  mutate(I = zoo::na.locf(I, na.rm=T)) %>%
+  mutate(J = zoo::na.locf(J, na.rm=T)) 
          
 # merge enrollment dataset with exac_long dataset
-exac_long_full <- left_join(enrollment_by_month, exac_long)
+exac_long_full <- left_join(enrollment_by_month_macro, exac_long)
 
 # add quarter, week and 90 day breaks
 exac_long_full$quarter <- as.Date(cut(exac_long_full$date, breaks = "quarter"))
@@ -137,16 +174,16 @@ exac_long_full <- exac_long_full %>%
   dplyr::filter(date>"2006-07-01") %>% # remove before July 2006
   dplyr::filter(date<="2009-11-10") %>% 
   mutate(exacyesno = ifelse(is.na(severity),0,1)) %>% # add marker variable for exacerbation
-  mutate(percent_exac = case_when(clinic=="A" ~ exacyesno/enrolled_current_a*100, 
-                                  clinic=="B" ~ exacyesno/enrolled_current_b*100,
-                                  clinic=="C" ~ exacyesno/enrolled_current_c*100,
-                                  clinic=="D" ~ exacyesno/enrolled_current_d*100,
-                                  clinic=="E" ~ exacyesno/enrolled_current_e*100,
-                                  clinic=="F" ~ exacyesno/enrolled_current_f*100,
-                                  clinic=="G" ~ exacyesno/enrolled_current_g*100,
-                                  clinic=="H" ~ exacyesno/enrolled_current_h*100,
-                                  clinic=="I" ~ exacyesno/enrolled_current_i*100,
-                                  clinic=="J" ~ exacyesno/enrolled_current_j*100)) %>% 
+  mutate(percent_exac = case_when(clinic=="A" ~ exacyesno/A*100, 
+                                  clinic=="B" ~ exacyesno/B*100,
+                                  clinic=="C" ~ exacyesno/C*100,
+                                  clinic=="D" ~ exacyesno/D*100,
+                                  clinic=="E" ~ exacyesno/E*100,
+                                  clinic=="F" ~ exacyesno/F*100,
+                                  clinic=="G" ~ exacyesno/G*100,
+                                  clinic=="H" ~ exacyesno/H*100,
+                                  clinic=="I" ~ exacyesno/I*100,
+                                  clinic=="J" ~ exacyesno/J*100)) %>% 
   mutate(percent_exac = ifelse(is.na(percent_exac),0,percent_exac)) %>%  # add percentage of that center with exacerbations on that day based on enrollment
   mutate(trtgroup_label = ifelse(trtgroup==1,"azithro","placebo"))
 
@@ -210,6 +247,12 @@ exac_grouped_ninety <- exac_long_full %>%
 
 ## export 90 day csv - for both placebo and azithro
 # write_csv(exac_grouped_ninety, "app/data/exacerbations_grouped_ninety.csv")
+
+## wide format 90 day rate file for clustering (both placebo and intervention)
+exac_grouped_ninety_wide <- exac_grouped_ninety %>% 
+  dplyr::select(clinic, clinic_name, ninetyday, total_exac_percent, latitude, longitude) %>% 
+  spread(ninetyday,total_exac_percent, fill=0) %>% 
+  dplyr::select(-'2006-05-30', -'2009-11-10')
 
 # group by 90 day increments and center - for placebo
 exac_grouped_ninety_placebo <- exac_long_full %>% 
@@ -390,7 +433,7 @@ copd_region <- baseline %>%
                                       clinic=="F" ~ "Cluster B",
                                       clinic=="G" ~ "Cluster A",
                                       clinic=="H" ~ "Cluster B",
-                                      clinic=="I" ~ "Cluster B",
+                                      clinic=="I" ~ "Cluster A",
                                       clinic=="J" ~ "Cluster A")) %>%
   mutate(region_cluster_h_1 = case_when(clinic=="A" ~ "Cluster A", 
                                          clinic=="B" ~ "Cluster B",

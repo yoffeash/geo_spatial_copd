@@ -84,3 +84,63 @@ histogram(~ rate_exacerb | clinic, data=kw_clinic)
 
 ggplot(data=kw_clinic, aes(x=season, y=timetoer)) + 
   geom_boxplot() 
+
+
+
+
+
+# load dataset with dates from 3/1/06 to 4/30/10 with enrollment by clinic
+enrollment_by_month_pre1 <- read_excel("data/raw_data/enrollment_by_clinic.xlsx")
+enrollment_by_month_pre1 <- enrollment_by_month_pre1 %>% mutate(date=as.Date(date))
+
+# add month column to enrollment data
+enrollment_by_month_pre1$month <- as.Date(cut(enrollment_by_month_pre1$date, breaks = "month"))
+
+# add the raw number enrolled each month (not cumulative) by center
+enrollment_by_month_pre2 <- enrollment_by_month_pre1 %>% 
+  group_by(month) %>% filter(date==min(date)) # keep only the first value for each month
+
+enrollment_by_month_pre3 <- enrollment_by_month_pre2 %>% ungroup() %>% 
+  mutate(delta_enroll_a = enrollment_clinic_a - lag(enrollment_clinic_a, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_b = enrollment_clinic_b - lag(enrollment_clinic_b, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_c = enrollment_clinic_c - lag(enrollment_clinic_c, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_d = enrollment_clinic_d - lag(enrollment_clinic_d, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_e = enrollment_clinic_e - lag(enrollment_clinic_e, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_f = enrollment_clinic_f - lag(enrollment_clinic_f, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_g = enrollment_clinic_g - lag(enrollment_clinic_g, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_h = enrollment_clinic_h - lag(enrollment_clinic_h, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_i = enrollment_clinic_i - lag(enrollment_clinic_i, default=0, order_by = month)) %>% 
+  mutate(delta_enroll_j = enrollment_clinic_j - lag(enrollment_clinic_j, default=0, order_by = month)) 
+
+# add the cumulative enrollment over the preceding 12 months
+enrollment_by_month_pre4 <- enrollment_by_month_pre3 %>% 
+  arrange(month) %>% 
+  mutate(enrolled_current_a = rollapplyr(delta_enroll_a, 12, sum, partial=TRUE)) %>%
+  mutate(enrolled_current_b = rollapplyr(delta_enroll_b, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_c = rollapplyr(delta_enroll_c, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_d = rollapplyr(delta_enroll_d, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_e = rollapplyr(delta_enroll_e, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_f = rollapplyr(delta_enroll_f, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_g = rollapplyr(delta_enroll_g, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_h = rollapplyr(delta_enroll_h, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_i = rollapplyr(delta_enroll_i, 12, sum, partial=TRUE)) %>% 
+  mutate(enrolled_current_j = rollapplyr(delta_enroll_j, 12, sum, partial=TRUE))
+
+# add list of all months between start (2006-03-17) and end (2010-04-02)
+date_empty <- data.frame(date=seq(as.Date("2006-03-01"), as.Date("2010-04-30"), by="days"))
+
+# merge empty date list with enrollment by month
+enrollment_pre1 <- left_join(date_empty,enrollment_by_month_pre4)
+
+# fill in enrollment numbers
+enrollment_by_month <- enrollment_pre1 %>% 
+  mutate(enrolled_current_a = zoo::na.locf(enrolled_current_a, na.rm=T)) %>%
+  mutate(enrolled_current_b = zoo::na.locf(enrolled_current_b, na.rm=T)) %>%
+  mutate(enrolled_current_c = zoo::na.locf(enrolled_current_c, na.rm=T)) %>%
+  mutate(enrolled_current_d = zoo::na.locf(enrolled_current_d, na.rm=T)) %>%
+  mutate(enrolled_current_e = zoo::na.locf(enrolled_current_e, na.rm=T)) %>%
+  mutate(enrolled_current_f = zoo::na.locf(enrolled_current_f, na.rm=T)) %>%
+  mutate(enrolled_current_g = zoo::na.locf(enrolled_current_g, na.rm=T)) %>%
+  mutate(enrolled_current_h = zoo::na.locf(enrolled_current_h, na.rm=T)) %>%
+  mutate(enrolled_current_i = zoo::na.locf(enrolled_current_i, na.rm=T)) %>%
+  mutate(enrolled_current_j = zoo::na.locf(enrolled_current_j, na.rm=T))
